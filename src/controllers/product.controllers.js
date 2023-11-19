@@ -1,4 +1,6 @@
 const Product = require('../models/product');
+const Division = require('../models/division');
+const District = require('../models/district');
 
 module.exports.getProduct = async (req, res) => {
     try {
@@ -42,7 +44,8 @@ module.exports.getProducts = async (req, res) => {
             })
         }
 
-        products = await Product.find({});
+        products = await Product.aggregate([{ $sample: { size: 50 } }])
+        // products = await Product.find({}).limit(10);
 
         if (products) {
             res.json({
@@ -69,12 +72,35 @@ module.exports.getProducts = async (req, res) => {
 
 module.exports.getSearchProducts = async (req, res) => {
     try {
-        const query = req.query?.value;
-        const products = await Product.find({ name: new RegExp(query, 'i') });
+        const { value, price, categories, sort, page } = req.query;
+
+        let filter = [
+            { price: { $gte: parseInt(price.split(',')[0]) } },
+            { price: { $lte: parseInt(price.split(',')[1]) } },
+        ];
+        if (value) filter.push({
+            $or: [
+                { name: new RegExp(value, 'i') },
+                { category: new RegExp(value, 'i') },
+            ]
+        });
+        if (categories) filter.push({ category: { $in: categories.split(',') } });
+
+        let products;
+        let totalProducts;
+        if (sort) {
+            totalProducts = await Product.find({ $and: filter })
+            products = await Product.find({ $and: filter }).sort(sort).skip(parseInt(page) * 15).limit(15)
+        } else {
+            totalProducts = await Product.find({ $and: filter })
+            products = await Product.find({ $and: filter }).skip(parseInt(page) * 15).limit(15)
+        }
+
         res.json({
             success: true,
+            data: products,
+            totalPage: Math.ceil(totalProducts.length / 15),
             message: 'successfully got the product',
-            data: products
         })
     } catch (error) {
         console.log(error);
@@ -85,3 +111,41 @@ module.exports.getSearchProducts = async (req, res) => {
     }
 }
 
+
+module.exports.getAllDivisions = async (req, res) => {
+    try {
+        const divisions = await Division.find({});
+
+        res.json({
+            success: true,
+            message: 'successfully got the divisions',
+            data: divisions
+        })
+    } catch (error) {
+        console.log(error);
+        res.json({
+            success: false,
+            error: error.message
+        })
+    }
+}
+
+
+module.exports.getAllDistricts = async (req, res) => {
+    try {
+        const division = req.query.division;
+        const districts = await District.find({ division });
+
+        res.json({
+            success: true,
+            message: 'successfully got the districts',
+            data: districts
+        })
+    } catch (error) {
+        console.log(error);
+        res.json({
+            success: false,
+            error: error.message
+        })
+    }
+}

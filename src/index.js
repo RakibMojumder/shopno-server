@@ -4,9 +4,12 @@ const express = require('express');
 const app = express();
 const cors = require('cors');
 
-// ROUTES
+
+// ROUTES IMPORTS
 const userRoute = require('./routes/user.route');
 const productRoute = require('./routes/product.route');
+const paymentRoute = require('./routes/payment.route');
+const orderRoute = require('./routes/order.route');
 
 // MIDDLE WARE
 app.use(cors());
@@ -20,7 +23,8 @@ app.get('/', (req, res) => {
 // ALL ROUTES
 app.use('/user', userRoute);
 app.use('/product', productRoute);
-
+app.use('/payment', paymentRoute);
+app.use('/order', orderRoute);
 
 
 //---------------------ERROR HANDLING---------------------
