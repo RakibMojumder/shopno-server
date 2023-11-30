@@ -13,6 +13,7 @@ const orderSchema = mongoose.Schema({
         postCode: String
     },
     totalPrice: Number,
+    date: Date,
     products: [
         {
             type: Object

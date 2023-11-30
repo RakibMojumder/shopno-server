@@ -7,6 +7,9 @@ const userSchema = mongoose.Schema({
         trim: true,
         required: [true, 'User name is required field.'],
     },
+    image: {
+        type: String,
+    },
     email: {
         type: String,
         required: [true, 'Email is required field'],
@@ -31,7 +34,7 @@ const userSchema = mongoose.Schema({
     }],
     role: {
         type: String,
-        enum: ['user', 'admin'],
+        enum: ['user', 'admin', 'manager'],
         default: 'user'
     },
     recentView: [{

@@ -2,6 +2,7 @@ const mongoose = require('mongoose')
 const Order = require('../models/order');
 const ObjectId = mongoose.Types.ObjectId;
 const stripe = require('stripe')(process.env.STRIPE_sk);
+const { format } = require("date-fns");
 
 // SSL COMMERZ IMPORTS
 const SSLCommerzPayment = require('sslcommerz-lts')
@@ -54,6 +55,7 @@ module.exports.paymentInit = async (req, res) => {
             paid: false,
             products: req.body.products,
             totalPrice,
+            date: format(new Date(), "PP"),
             customerInfo: {
                 name: req.body.username,
                 email: req.body.userEmail,
@@ -75,7 +77,7 @@ module.exports.paymentInit = async (req, res) => {
 module.exports.paymentSuccess = async (req, res) => {
     try {
         const transactionId = req.query.transactionId;
-        const document = await Order.findOneAndUpdate({ transactionId }, { paid: true }, { new: true });
+        await Order.findOneAndUpdate({ transactionId }, { paid: true }, { new: true });
 
         res.redirect(`${process.env.CLIENT_URL}/payment-success?transactionId=${transactionId}`)
 
@@ -139,7 +141,7 @@ module.exports.createPaymentIntent = async (req, res) => {
             message: 'Successfully got the client secret'
         })
     } catch (error) {
-        // console.log(error);
+        console.log(error);
         res.json({
             success: false,
             message: error.message
@@ -148,4 +150,21 @@ module.exports.createPaymentIntent = async (req, res) => {
 }
 
 
-module.exports.stripePayment = async (req, res) => { }
+module.exports.stripePayment = async (req, res) => {
+    try {
+        const order = await Order.create({ ...req.body });
+
+        res.json({
+            success: true,
+            transactionId: req.body.transactionId,
+            date: format(new Date(), "PP"),
+            message: 'successfully paid payment'
+        })
+    } catch (error) {
+        console.log(error);
+        res.json({
+            success: false,
+            message: error.message
+        })
+    }
+}

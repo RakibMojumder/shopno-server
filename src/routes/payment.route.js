@@ -7,7 +7,7 @@ router.route('/').post(paymentInit);
 router.route('/fail').post(paymentFailed);
 router.route('/cancel').post(paymentCancel);
 router.route('/success').post(paymentSuccess);
-router.route('/stripe-payment').post(stripePayment)
+router.route('/stripe-payment').post(verifyToken, stripePayment)
 router.route('/create-payment-intent').post(verifyToken, createPaymentIntent);
 
 module.exports = router;

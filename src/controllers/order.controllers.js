@@ -24,7 +24,8 @@ module.exports.getUsersOrder = async (req, res) => {
         const email = req.query.email;
         const product = await Order.aggregate([
             { $match: { "customerInfo.email": email } },
-            { $sort: { createdAt: -1 } }
+            { $group: { _id: "$date", orders: { $push: '$products' } } },
+            { $sort: { _id: -1 } }
         ]);
 
         res.json({

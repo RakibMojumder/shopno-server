@@ -1,6 +1,7 @@
 const Product = require('../models/product');
 const Division = require('../models/division');
 const District = require('../models/district');
+const { getSearchProduct } = require('../helper/getSearchProduct');
 
 module.exports.getProduct = async (req, res) => {
     try {
@@ -32,7 +33,7 @@ module.exports.getProduct = async (req, res) => {
 
 module.exports.getProducts = async (req, res) => {
     try {
-        const { category } = req.query;
+        const { category, page } = req.query;
         let products;
 
         if (category) {
@@ -43,9 +44,18 @@ module.exports.getProducts = async (req, res) => {
                 data: products
             })
         }
+        if (page) {
+            const { products, totalProducts } = await getSearchProduct(req.query, 20);
+
+            return res.json({
+                success: true,
+                message: 'successfully find products',
+                totalPage: Math.ceil(totalProducts.length / 20),
+                data: products
+            })
+        }
 
         products = await Product.aggregate([{ $sample: { size: 50 } }])
-        // products = await Product.find({}).limit(10);
 
         if (products) {
             res.json({
@@ -72,29 +82,7 @@ module.exports.getProducts = async (req, res) => {
 
 module.exports.getSearchProducts = async (req, res) => {
     try {
-        const { value, price, categories, sort, page } = req.query;
-
-        let filter = [
-            { price: { $gte: parseInt(price.split(',')[0]) } },
-            { price: { $lte: parseInt(price.split(',')[1]) } },
-        ];
-        if (value) filter.push({
-            $or: [
-                { name: new RegExp(value, 'i') },
-                { category: new RegExp(value, 'i') },
-            ]
-        });
-        if (categories) filter.push({ category: { $in: categories.split(',') } });
-
-        let products;
-        let totalProducts;
-        if (sort) {
-            totalProducts = await Product.find({ $and: filter })
-            products = await Product.find({ $and: filter }).sort(sort).skip(parseInt(page) * 15).limit(15)
-        } else {
-            totalProducts = await Product.find({ $and: filter })
-            products = await Product.find({ $and: filter }).skip(parseInt(page) * 15).limit(15)
-        }
+        const { products, totalProducts } = await getSearchProduct(req.query, 15);
 
         res.json({
             success: true,
@@ -141,6 +129,25 @@ module.exports.getAllDistricts = async (req, res) => {
             message: 'successfully got the districts',
             data: districts
         })
+    } catch (error) {
+        console.log(error);
+        res.json({
+            success: false,
+            error: error.message
+        })
+    }
+}
+
+
+module.exports.getBestSellerProduct = async (req, res) => {
+    try {
+        const products = await Product.find({}).sort('-totalRating').limit(10);
+        res.json({
+            success: true,
+            message: 'successfully got the products',
+            data: products
+        })
+
     } catch (error) {
         console.log(error);
         res.json({
