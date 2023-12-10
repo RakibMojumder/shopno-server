@@ -1,7 +1,7 @@
 const Product = require('../models/product');
 
 module.exports.getSearchProduct = async (query, limit) => {
-    const { value, price, categories, sort, page } = query;
+    const { value, price, categories, sort, page, rating } = query;
 
     let filter = [
         { price: { $gte: parseInt(price.split(',')[0]) } },
@@ -14,6 +14,7 @@ module.exports.getSearchProduct = async (query, limit) => {
         ]
     });
     if (categories) filter.push({ category: { $in: categories.split(',') } });
+    if (!rating === null) filter.push({ rating: { $gte: parseInt(rating) } });
 
     let products;
     let totalProducts;

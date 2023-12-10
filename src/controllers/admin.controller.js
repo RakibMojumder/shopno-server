@@ -1,5 +1,6 @@
 const Product = require('../models/product');
 const User = require('../models/user');
+const Order = require('../models/order');
 const { v2: cloudinary } = require('cloudinary');
 
 module.exports.getAllProductsAdmin = async (req, res) => {
@@ -118,6 +119,29 @@ module.exports.getAllUsers = async (req, res) => {
             success: true,
             message: 'successfully got the users',
             data: users
+        })
+    } catch (error) {
+        console.log(error);
+        res.json({
+            success: false,
+            error: error.message
+        })
+    }
+};
+
+module.exports.getAllOrders = async (req, res) => {
+    try {
+
+        const orders = await Order.aggregate([
+            { $match: {} },
+            { $group: { _id: "$date", orders: { $push: { products: '$products', customerEmail: "$customerInfo.email", transactionId: '$transactionId' } } } },
+            { $sort: { _id: -1 } }
+        ]);
+
+        res.json({
+            success: true,
+            message: 'successfully got the users',
+            data: orders
         })
     } catch (error) {
         console.log(error);

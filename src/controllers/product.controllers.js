@@ -33,7 +33,7 @@ module.exports.getProduct = async (req, res) => {
 
 module.exports.getProducts = async (req, res) => {
     try {
-        const { category, page } = req.query;
+        const { category } = req.query;
         let products;
 
         if (category) {
@@ -44,18 +44,8 @@ module.exports.getProducts = async (req, res) => {
                 data: products
             })
         }
-        if (page) {
-            const { products, totalProducts } = await getSearchProduct(req.query, 20);
 
-            return res.json({
-                success: true,
-                message: 'successfully find products',
-                totalPage: Math.ceil(totalProducts.length / 20),
-                data: products
-            })
-        }
-
-        products = await Product.aggregate([{ $sample: { size: 50 } }])
+        products = await Product.aggregate([{ $sample: { size: 35 } }])
 
         if (products) {
             res.json({
@@ -82,12 +72,12 @@ module.exports.getProducts = async (req, res) => {
 
 module.exports.getSearchProducts = async (req, res) => {
     try {
-        const { products, totalProducts } = await getSearchProduct(req.query, 15);
+        const { products, totalProducts } = await getSearchProduct(req.query, 20);
 
         res.json({
             success: true,
             data: products,
-            totalPage: Math.ceil(totalProducts.length / 15),
+            totalPage: Math.ceil(totalProducts.length / 20),
             message: 'successfully got the product',
         })
     } catch (error) {
