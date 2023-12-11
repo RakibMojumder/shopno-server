@@ -19,8 +19,14 @@ const productSchema = Schema({
     },
     description: String,
     discountPrice: Number,
-    rating: Number,
-    totalRating: Number,
+    rating: {
+        type: Number,
+        default: 0
+    },
+    totalRating: {
+        type: Number,
+        default: 0
+    },
     image: String,
     reviews: [{
         type: ObjectId,

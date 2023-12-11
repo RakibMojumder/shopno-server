@@ -1,4 +1,4 @@
-const data = [
+module.exports.data = [
     {
         name: 'Transparent Frame Clear glass for Men',
         category: 'Fashion',

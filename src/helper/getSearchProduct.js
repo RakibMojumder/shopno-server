@@ -6,6 +6,7 @@ module.exports.getSearchProduct = async (query, limit) => {
     let filter = [
         { price: { $gte: parseInt(price.split(',')[0]) } },
         { price: { $lte: parseInt(price.split(',')[1]) } },
+        { rating: { $gte: parseInt(rating) } }
     ];
     if (value) filter.push({
         $or: [
@@ -14,7 +15,6 @@ module.exports.getSearchProduct = async (query, limit) => {
         ]
     });
     if (categories) filter.push({ category: { $in: categories.split(',') } });
-    if (!rating === null) filter.push({ rating: { $gte: parseInt(rating) } });
 
     let products;
     let totalProducts;

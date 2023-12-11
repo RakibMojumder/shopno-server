@@ -90,6 +90,33 @@ module.exports.getSearchProducts = async (req, res) => {
 }
 
 
+module.exports.getRelatedProducts = async (req, res) => {
+    try {
+        const products = await Product.aggregate([
+            {
+                $match: {
+                    $and: [
+                        { category: req.query.category },
+                        { $expr: { $ne: ['$_id', { $toObjectId: req.params.id }] } }
+                    ]
+                }
+            }
+        ])
+
+        res.json({
+            success: true,
+            data: products.slice(0, 5),
+            message: 'successfully got the product',
+        })
+    } catch (error) {
+        console.log(error);
+        res.json({
+            success: false,
+            error: error.message
+        })
+    }
+}
+
 module.exports.getAllDivisions = async (req, res) => {
     try {
         const divisions = await Division.find({});
