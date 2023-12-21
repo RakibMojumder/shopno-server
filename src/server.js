@@ -20,6 +20,7 @@ const productRoute = require('./routes/product.route');
 const paymentRoute = require('./routes/payment.route');
 const orderRoute = require('./routes/order.route');
 const adminRoute = require('./routes/admin.route');
+const reviewRoute = require('./routes/review.route');
 
 // MIDDLE WARE
 app.use(cors());
@@ -39,6 +40,7 @@ app.use('/product', productRoute);
 app.use('/payment', paymentRoute);
 app.use('/order', orderRoute);
 app.use('/admin', adminRoute);
+app.use('/review', reviewRoute);
 
 
 //---------------------ERROR HANDLING---------------------
