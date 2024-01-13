@@ -20,9 +20,9 @@ module.exports.paymentInit = async (req, res) => {
         total_amount: totalPrice + 150,
         currency: 'BDT',
         tran_id: transactionId, // use unique tran_id for each api call
-        success_url: `http://localhost:5000/payment/success?transactionId=${transactionId}`,
-        fail_url: `http://localhost:5000/payment/fail?transactionId=${transactionId}`,
-        cancel_url: `http://localhost:5000/payment/cancel?transactionId=${transactionId}`,
+        success_url: `${process.env.SERVER_URL}/payment/success?transactionId=${transactionId}`,
+        fail_url: `${process.env.SERVER_URL}/payment/fail?transactionId=${transactionId}`,
+        cancel_url: `${process.env.SERVER_URL}/payment/cancel?transactionId=${transactionId}`,
         ipn_url: 'http://localhost:3030/ipn',
         shipping_method: 'Courier',
         product_name: 'Computer.',

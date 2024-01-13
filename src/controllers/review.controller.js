@@ -28,7 +28,9 @@ module.exports.addReview = async (req, res) => {
 module.exports.getReviews = async (req, res) => {
     try {
         const reviews = await Review.aggregate([
-            { $match: { productId: new ObjectId(req.query.productId) } },
+            {
+                $match: { productId: new ObjectId(req.query.productId) }
+            },
             {
                 $lookup: {
                     from: 'users',
@@ -36,7 +38,9 @@ module.exports.getReviews = async (req, res) => {
                     foreignField: '_id',
                     as: 'user',
                     pipeline: [
-                        { $project: { _id: 0, username: 1, email: 1 } }
+                        {
+                            $project: { _id: 0, username: 1, email: 1 }
+                        }
                     ]
                 }
             },
